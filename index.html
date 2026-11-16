@@ -750,7 +750,7 @@ const HI_X={"Attempt":"प्रयास करें","MIX":"मिक्स",
 "📷 Add your photo":"📷 अपनी फ़ोटो जोड़ें","Your photo stays on this device. It is dressed in attire that matches your rank.":"आपकी फ़ोटो इसी डिवाइस पर रहती है। इसे आपकी रैंक के अनुरूप पोशाक पहनाई जाती है।",
 "Career ladder":"करियर सीढ़ी","You are here":"आप यहाँ हैं","Sounds ON":"ध्वनि चालू","Sounds OFF":"ध्वनि बंद","Soft chimes for answers, stars and celebrations":"उत्तरों, स्टार और उत्सवों के लिए हल्की ध्वनि","Recent mocks":"हाल के मॉक","No mocks yet.":"अभी कोई मॉक नहीं।","Account":"खाता","Language":"भाषा","App language":"ऐप की भाषा",
 "Leaderboard 🏆":"लीडरबोर्ड 🏆","Live":"लाइव","Loading…":"लोड हो रहा है…","Can't reach the leaderboard yet":"अभी लीडरबोर्ड तक नहीं पहुँच पा रहे","Live leaderboard isn't available in this view: you're seeing your own score only.":"इस दृश्य में लाइव लीडरबोर्ड उपलब्ध नहीं है: आप केवल अपना स्कोर देख रहे हैं।",
-"This week":"इस सप्ताह","State":"राज्य","All time":"अब तक","Weekly board resets every Monday. Every question you solve earns XP, in Hindi or English alike.":"साप्ताहिक बोर्ड हर सोमवार रीसेट होता है। हर हल किया गया प्रश्न XP देता है, हिंदी हो या अंग्रेज़ी।",
+"This week":"इस सप्ताह","State":"राज्य","All time":"अब तक","Weekly board resets every Monday. A question answered correctly for the first time earns 10 XP; repeats earn 2 XP. Hindi or English, it counts the same.":"साप्ताहिक बोर्ड हर सोमवार नया होता है। किसी प्रश्न का पहली बार सही उत्तर देने पर 10 XP; दोबारा सही करने पर 2 XP। हिंदी हो या अंग्रेज़ी, गिनती एक जैसी।",
 "No scores yet this week. Be the first on the board!":"इस सप्ताह अभी कोई स्कोर नहीं। बोर्ड पर पहले बनें!","Sign up to appear here":"यहाँ दिखने के लिए साइन अप करें","Free account · takes 30 seconds":"निःशुल्क खाता · 30 सेकंड लगते हैं","Sign up":"साइन अप",
 "View a state leaderboard":"किसी राज्य का लीडरबोर्ड देखें","Your own rank counts in":"आपकी रैंक यहाँ गिनी जाती है:","you're":"आप हैं",
 "← Profile":"← प्रोफ़ाइल","← Back":"← वापस","← Home":"← होम","Registered students":"पंजीकृत छात्र","Visible only to you, the owner.":"केवल आपको (स्वामी) दिखाई देता है।","Students":"छात्र","WhatsApp opt-in":"व्हाट्सऐप सहमति","Copy all as CSV":"सभी को CSV के रूप में कॉपी करें","Couldn't load students right now.":"अभी छात्रों को लोड नहीं कर सके।",
@@ -893,7 +893,10 @@ function freshG(){return {xp:0,streak:0,last:"",hear:{},badges:[],answered:0,tim
 let G=Object.assign(freshG(),store.get("dhara_game",{}));
 let PHOTO=store.get("dhara_photo","");
 function saveG(){store.set("dhara_game",G);if(typeof scheduleSync==="function")scheduleSync()}
-const ALL=[];PAPERS.forEach(p=>p.qs.forEach(q=>{q.paper=p.title;ALL.push(q)}));
+const ALL=[];PAPERS.forEach(p=>p.qs.forEach(q=>{q.paper=p.title;ALL.push(q)}));ALL.forEach((q,i)=>{q.k=i});
+/* full XP only the first time a question is answered correctly; repeats earn a little */
+const XP_NEW=10,XP_REP=2;
+function okNew(q){if(!q||q.k==null)return true;let s=G.okq||"";if(s.length<ALL.length)s=s.padEnd(ALL.length,"0");const nw=s[q.k]!=="1";if(nw)s=s.slice(0,q.k)+"1"+s.slice(q.k+1);G.okq=s;return nw}
 const SUBJECTS=(()=>{const m={};ALL.forEach(q=>m[q.s]=(m[q.s]||0)+1);return Object.entries(m).sort((a,b)=>(a[0]==="Other Laws")-(b[0]==="Other Laws")||b[1]-a[1])})();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const $=id=>document.getElementById(id);
@@ -903,11 +906,11 @@ function go(v,x){if(typeof narrStop==="function"&&NARR.on)narrStop();Object.assi
 /* ---------- career ladder ---------- */
 const RANKS=[
  {n:"Law Student",xp:0,em:"📚",line:"Your journey to the Bar begins."},
- {n:"Legal Intern",xp:300,em:"🗂️",line:"You're drafting, researching and learning the ropes."},
- {n:"Junior Advocate",xp:900,em:"⚖️",line:"Black coat, white bands — you're arguing your first matters."},
- {n:"Advocate",xp:2000,em:"🏛️",line:"Clients trust you. The court listens."},
- {n:"Senior Advocate",xp:4000,em:"🎓",line:"The gown is yours. Juniors look up to you."},
- {n:"Legal Luminary",xp:7000,em:"🌟",line:"A name the whole Bar respects."}];
+ {n:"Legal Intern",xp:1000,em:"🗂️",line:"You're drafting, researching and learning the ropes."},
+ {n:"Junior Advocate",xp:3000,em:"⚖️",line:"Black coat, white bands — you're arguing your first matters."},
+ {n:"Advocate",xp:7000,em:"🏛️",line:"Clients trust you. The court listens."},
+ {n:"Senior Advocate",xp:14000,em:"🎓",line:"The gown is yours. Juniors look up to you."},
+ {n:"Legal Luminary",xp:25000,em:"🌟",line:"A name the whole Bar respects."}];
 function rankOf(xp){let r=0;RANKS.forEach((x,i)=>{if(xp>=x.xp)r=i});return r}
 const SUBJ_ROOM={"Civil Procedure":["🏛️","Civil Court"],"Constitution":["📜","Constitution Bench"],"Criminal Law":["⚔️","Sessions Court"],"Criminal Procedure":["🚔","Magistrate's Court"],"Evidence":["🔍","Evidence Chamber"],"Contract & Specific Relief":["🤝","Commercial Court"],"Family Law":["👪","Family Court"],"Professional Ethics":["🎓","Bar Council Hall"],"Labour & Industrial":["🏭","Labour Court"],"Torts, MV & Consumer":["🚗","Consumer Forum"],"Arbitration":["🕊️","Arbitral Tribunal"],"Company Law":["🏢","Company Law Tribunal"],"Environment & Cyber":["🌿","Green & Cyber Bench"],"Property & Easements":["🏡","Property Registry"],"Administrative Law":["🗃️","Administrative Tribunal"],"Negotiable Instruments":["🧾","Cheque Bounce Court"],"Taxation":["💼","Tax Tribunal"],"Jurisprudence":["🦉","Jurists' Library"],"Land Acquisition":["🗺️","Land Collector"],"Limitation":["⏳","Limitation Desk"],"Other Laws":["📚","Law Library"]};
 const room=s=>SUBJ_ROOM[s]||["⚖️",s+" Court"];
@@ -1035,12 +1038,12 @@ ${d?QO(q).map((o,k)=>`<div class="ro ${k===q.a?'right':(k===u?'wrong':'')}"><spa
 :QO(q).map((o,k)=>`<button class="op" onclick="pAns(${k})"><span class="rd"></span><span><span class="k">(${L[k]})</span>${esc(o)}</span></button>`).join("")}</div>
 <div class="cbt-foot"><div class="r"><button class="cb sm" onclick="T=null;go('chamber')">Leave</button>${d?`<button class="cb green" onclick="T.i++;render();window.scrollTo(0,0)">${T.i<n-1?'Next ›':'Hear the verdict ⚖️'}</button>`:`<button class="cb" onclick="T.ans[T.i]=-1;T.combo=0;T.i++;render();window.scrollTo(0,0)">Skip ›</button>`}</div></div></div>`}
 function pAns(k){if(T.ans[T.i]!==undefined)return;T.ans[T.i]=k;G.answered++;addSolved(1);const ok=k===T.qs[T.i].a;try{addSubjStats({[T.qs[T.i].s]:{c:ok?1:0,n:1}})}catch(e){}
-clearInterval(qTimer);const fast=G.timed&&T.qStart&&Date.now()-T.qStart<15000;if(ok){T.score++;T.combo++;const g=10+(T.combo>=3?5:0)+(fast?5:0);T.xp+=g;sfx("correct");render();floatFx("+"+g+" XP"+(fast?" ⚡":"")+(T.combo>=3?" 🔥":""))}else{T.combo=0;sfx("wrong");render();const p=$("qp");if(p)p.classList.add("shake");floatFx("Overruled","#C53B33")}
+clearInterval(qTimer);const fast=G.timed&&T.qStart&&Date.now()-T.qStart<15000;if(ok){T.score++;T.combo++;const nw=okNew(T.qs[T.i]);const g=nw?XP_NEW+(T.combo>=3?5:0)+(fast?5:0):XP_REP;T.xp+=g;sfx("correct");render();floatFx("+"+g+" XP"+(nw?(fast?" ⚡":"")+(T.combo>=3?" 🔥":""):" · repeat"))}else{T.combo=0;sfx("wrong");render();const p=$("qp");if(p)p.classList.add("shake");floatFx("Overruled","#C53B33")}
 if(G.answered>=100)award("q100");if(G.answered>=500)award("q500");saveG()}
 function finishHearing(){if(T.mode==="b")return finishBonus();const n=T.qs.length,pct=T.score/n,stars=pct>=.9?3:pct>=.7?2:pct>=.5?1:0;
 const prev=(G.hear[T.subj]||{})[T.idx];G.hear[T.subj]=G.hear[T.subj]||{};
 if(stars>0&&(prev===undefined||stars>prev))G.hear[T.subj][T.idx]=stars;
-const bonus=stars*20;const nb=stars===3?award("h3"):null;addXP(T.xp+bonus);
+const bonus=(stars>0&&(prev===undefined||stars>prev))?stars*20:0;const nb=stars===3?award("h3"):null;addXP(T.xp+bonus);
 const msg=stars===3?["Case won with costs!","A flawless hearing. The bench is impressed."]:stars===2?["Judgment in your favour","Strong arguments. A little polish for 3 stars."]:stars===1?["Matter allowed","You've cleared this hearing. Revisit for more stars."]:["Adjourned","Score 5/10 or more to clear this hearing. Try again!"];
 const H=Math.ceil(subjQs(T.subj).length/10),hasNext=stars>0&&T.idx+1<H;const firstClear=stars>0&&prev===undefined;const mile=firstClear?milestone(T.subj,T.idx,H):null;
 setTimeout(()=>{overlay(`<div style="font-size:54px">${stars?'⚖️':'📅'}</div><div class="tier">${esc(T.title)}</div><h2>${msg[0]}</h2>
@@ -1096,9 +1099,9 @@ function askSubmit(){modal(`<h3>Submit the exam?</h3><p>You cannot change your a
 <div style="display:flex;gap:8px"><button class="btn ghost" onclick="closeModal()">Go back</button><button class="btn" style="background:var(--cbt)" onclick="submitExam()">Yes, submit</button></div>`,true)}
 function askQuit(){modal(`<h3>Exit the exam?</h3><p>This attempt will not be saved.</p><div style="display:flex;gap:8px;margin-top:16px"><button class="btn ghost" onclick="closeModal()">Stay</button><button class="btn" style="background:var(--bad)" onclick="closeModal();clearInterval(timerId);T=null;go(S.tab)">Exit</button></div>`,true)}
 function submitExam(auto){clearInterval(timerId);closeModal();if(!T||T.res)return;let c=0,w=0;const bs={};
-T.qs.forEach((q,i)=>{bs[q.s]=bs[q.s]||{c:0,n:0};bs[q.s].n++;if(T.ans[i]===undefined)return;if(T.ans[i]===q.a){c++;bs[q.s].c++}else w++});
+let cn=0;T.qs.forEach((q,i)=>{bs[q.s]=bs[q.s]||{c:0,n:0};bs[q.s].n++;if(T.ans[i]===undefined)return;if(T.ans[i]===q.a){c++;bs[q.s].c++;if(okNew(q))cn++}else w++});
 const pct=Math.round(c/T.qs.length*100);T.res={c,w,s:T.qs.length-c-w,pct,used:Math.min(T.total,Math.round((Date.now()-T.start)/1000)),bs,auto};
-const tier=pct>=90?3:pct>=80?2:pct>=PASS?1:0;const bonus=[0,100,200,300][tier];T.res.xp=c*10+bonus;T.res.bonus=bonus;let nb=[];try{if(typeof sprintRecord==="function")sprintRecord(T)}catch(e){}try{setTimeout(()=>{if(typeof syncNow==="function"){clearTimeout(syncTimer);syncTimer=null;syncNow()}},800)}catch(e){}try{addSolved(c+w)}catch(e){}try{clearTimeout(syncTimer);setTimeout(syncNow,800)}catch(e){}
+const tier=pct>=90?3:pct>=80?2:pct>=PASS?1:0;G.pdone=G.pdone||{};const pkey=T.kind==="dm"?"dm:"+(T.dk||""):T.title;const firstTry=!G.pdone[pkey]&&T.kind!=="dmp";G.pdone[pkey]=1;const bonus=firstTry?[0,100,200,300][tier]:0;T.res.xp=cn*XP_NEW+(c-cn)*XP_REP+bonus;T.res.bonus=bonus;T.res.cn=cn;let nb=[];try{if(typeof sprintRecord==="function")sprintRecord(T)}catch(e){}try{setTimeout(()=>{if(typeof syncNow==="function"){clearTimeout(syncTimer);syncTimer=null;syncNow()}},800)}catch(e){}try{addSolved(c+w)}catch(e){}try{clearTimeout(syncTimer);setTimeout(syncNow,800)}catch(e){}
 try{history.push({t:T.title,at:Date.now(),pct,c,att:c+w});store.set("dhara_hist2",history)}catch(e){}
 try{nb=[award("first"),tier>=1&&award("pass"),tier>=2&&award("dist"),tier>=3&&award("gold")].filter(Boolean);addXP(T.res.xp)}catch(e){}
 S.filter="all";S.shown=30;go("result");window.scrollTo(0,0);try{celebrate(tier,nb)}catch(e){}}
@@ -1251,7 +1254,7 @@ function board(){const tab=S.btab||"week",wk=WK();setTimeout(()=>ensureBoard(tab
  ${!profile.reg?`<div class="section"><div class="card row" style="background:#FFF4EA;border-color:#F5C9A6"><div style="font-size:26px">✍️</div><div class="meta"><h4>Sign up to appear here</h4><p>Free account · takes 30 seconds</p></div><button class="btn sm" onclick="go('signup')">Sign up</button></div></div>`:''}
  <div class="section">${rest.map((r,i)=>`<div class="lb ${r.id===(UID||'me')?'me':''}"><span class="pos">${i+4}</span>${face(r,36)}<div class="meta"><h4 style="font-size:14px">${esc(r.name||"Student")} ${LTAG(r)}${r.id===(UID||'me')?' (you)':''}</h4><p>${RANKS[Math.min(r.rank||0,5)].n}${r.best?` · Best mock ${r.best}%`:''}</p></div><b>${val(r)}</b></div>`).join("")}
  ${myPos>=0&&rows.length>3?`<p class="disc">You're <b>#${myPos+1}</b> of ${rows.length}${tab==="week"?" this week":""}.</p>`:''}</div>
- <p class="disc">Weekly board resets every Monday. Every question you solve earns XP, in Hindi or English alike.</p></div>${nav()}`}
+ <p class="disc">Weekly board resets every Monday. A question answered correctly for the first time earns 10 XP; repeats earn 2 XP. Hindi or English, it counts the same.</p></div>${nav()}`}
 
 /* ---------- owner: registered students ---------- */
 async function loadAdmin(){ADMIN={state:"loading",rows:[]};render();
