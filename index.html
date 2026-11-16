@@ -728,7 +728,7 @@ function webSignupCard(){if(!WEB)return "";const g=FBU&&!FBU.isAnonymous;
 
 /* home nudge: registered on this phone without Google, so progress lives only on this device */
 function webSaveNudge(){if(!WEB||!FBU||!FBU.isAnonymous||!profile.reg)return "";if(store.get("dhara_nudge_off",0)===dkey())return "";
- return `<div class="section" style="padding-bottom:0"><div class="card gsu nudge"><div style="display:flex;gap:10px;align-items:flex-start;text-align:left"><span style="font-size:24px">🔐</span><div><b>${t2("Save your progress","अपनी प्रगति सुरक्षित करें")}</b><small style="margin-top:2px">${t2("Your XP is saved only on this phone. Sign in with Google so you never lose it.","आपके XP अभी केवल इस फ़ोन पर हैं। Google से साइन इन करें ताकि ये कभी न खोएँ।")}</small></div></div><button type="button" class="gbtn" style="margin-top:10px" onclick="webSignIn()">${GBTN}</button><button type="button" class="more" style="margin-top:4px" onclick="store.set('dhara_nudge_off',dkey());render()">${t2("Later","बाद में")}</button></div></div>`}
+ return `<div class="section" style="padding-bottom:0"><div class="card gsu nudge"><div style="display:flex;gap:10px;align-items:flex-start;text-align:left"><span style="font-size:24px">🔐</span><div><b>${t2("Save your progress","अपनी प्रगति सुरक्षित करें")}</b><small style="margin-top:2px">${t2("Your XP, mocks and history are tied to this browser only. If you change phone, clear data or the app moves, they will be lost. Sign in with Google once (10 seconds) to keep them safe forever.","आपके XP, मॉक और हिस्ट्री अभी सिर्फ़ इसी ब्राउज़र में हैं। फ़ोन बदलने, डेटा साफ़ करने या ऐप का लिंक बदलने पर ये खो जाएँगे। एक बार Google से साइन इन करें (10 सेकंड) — हमेशा के लिए सुरक्षित।")}</small></div></div><button type="button" class="gbtn" style="margin-top:10px" onclick="webSignIn()">${GBTN}</button><button type="button" class="more" style="margin-top:4px" onclick="store.set('dhara_nudge_off',dkey());render()">${t2("Later","बाद में")}</button></div></div>`}
 
 /* support */
 const HELP_WA="919211994576";
@@ -2990,7 +2990,7 @@ function reportAns(i){const q=(T&&T.qs||[])[i];if(!q)return;const L4="ABCD";
 function dayStat(){const k=dkey(),D=G.day7=G.day7||{};Object.keys(D).forEach(x=>{if(x<dkey(new Date(istNow().getTime()-7*864e5)))delete D[x]});return D[k]=D[k]||{q:0,t:0,br:[]}}
 function boardExtras(){let ws=null;try{const w=weakest(1)[0];if(w)ws=[w[0],Math.round(w[1].c/w[1].n*100)]}catch(e){}
  let bar=[];try{bar=Object.keys(G.senBar||{}).filter(id=>barLeft(id)>0)}catch(e){}
- return {d7:G.day7||{},sen:G.sen?G.sen.id:null,bar,ws}}
+ return {d7:G.day7||{},sen:G.sen?G.sen.id:null,bar,ws,gl:(typeof WEB!=='undefined'&&WEB&&FBU&&!FBU.isAnonymous)?1:0}}
 
 let OWN=null;
 async function ownLoad(){OWN={state:"loading"};render();
@@ -3012,7 +3012,7 @@ function ownCalc(){const O=OWN,k=O.k,B=O.board,St=O.students,dayOf=t=>dkey(new D
  const dm=B.filter(r=>r.dm&&r.dm.d===k).sort((a,b)=>b.dm.c-a.dm.c||a.dm.used-b.dm.used);
  const senN={},barN={},wsN={};B.forEach(r=>{if(r.sen)senN[r.sen]=(senN[r.sen]||0)+1;(r.bar||[]).forEach(id=>barN[id]=(barN[id]||0)+1);if(r.ws)wsN[r.ws[0]]=(wsN[r.ws[0]]||0)+1});
  const quiet=B.filter(r=>{const ds=Object.keys(r.d7||{}).filter(d=>(r.d7[d].q||0)>0).sort();const last=ds[ds.length-1];return last&&last<O.days[4]&&(r.xp||0)>=200}).sort((a,b)=>(b.xp||0)-(a.xp||0));
- return {today,q:sum(today,r=>r.d7[k].q),t:sum(today,r=>r.d7[k].t),newToday:St.filter(s=>dayOf(s.createdAt)===k).length,total:St.length,onBoard:B.length,trend,tb,brief,dm,senN,barN,wsN,quiet,
+ return {glN:B.filter(r=>r.gl).length,today,q:sum(today,r=>r.d7[k].q),t:sum(today,r=>r.d7[k].t),newToday:St.filter(s=>dayOf(s.createdAt)===k).length,total:St.length,onBoard:B.length,trend,tb,brief,dm,senN,barN,wsN,quiet,
   top:today.slice().sort((a,b)=>(b.d7[k].q||0)-(a.d7[k].q||0)).slice(0,5)}}
 
 function ownBars(tr,key,col){const mx=Math.max(1,...tr.map(x=>x[key]));
@@ -3038,7 +3038,7 @@ function owner(){if(!IS_OWNER||!DB)return `<div><div class="simplehead"><button 
  return `<div>${head}
  <div class="section noi18n" style="padding-top:0">
  ${alerts.length?`<div class="card ow-alert">${alerts.map(a=>`<p>⚠️ ${esc(a)}</p>`).join("")}</div>`:`<div class="card ow-ok"><p>✅ Today's brief is live, all six rulings are new and every judgment link is official.</p></div>`}
- <div class="card"><div class="counts" style="grid-template-columns:repeat(4,1fr)"><div><b>${c.today.length}</b><span>Active today</span></div><div><b>${c.q}</b><span>Questions</span></div><div><b>${c.t}</b><span>Tests</span></div><div><b>${c.newToday}</b><span>New sign-ups</span></div></div>
+ <div class="card"><div class="counts" style="grid-template-columns:repeat(4,1fr)"><div><b>${c.today.length}</b><span>Active today</span></div><div><b>${c.q}</b><span>Questions</span></div><div><b>${c.t}</b><span>Tests</span></div><div><b>${c.newToday}</b><span>New sign-ups</span></div></div><div class="ow-gl" style="margin-top:10px;font-size:13px;color:var(--muted)">🔐 ${t2('Saved with Google','Google से सुरक्षित')}: <b>${c.glN}</b> / ${c.onBoard}</div>
  <p style="font-size:12px;color:var(--muted);margin-top:6px">${c.total} registered · ${c.onBoard} on the board · updated ${mins<1?"just now":mins+" min ago"}</p></div>
 
  <div class="sh" style="margin-top:16px"><h3>Last 7 days</h3></div>
