@@ -656,6 +656,9 @@ body.hi .iq>b{font-size:16.5px;line-height:1.6}
 .cm-btn span{font-size:22px}.cm-btn b{display:block;font-size:14px}.cm-btn small{display:block;font-size:12px;color:var(--muted)}
 .cm-rules{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:4px}
 .rp-btn{background:none;border:0;color:var(--muted);font:600 12px Inter,system-ui,sans-serif;margin-top:8px;padding:4px 0;cursor:pointer;text-decoration:underline}
+
+select.pickbtn{-webkit-appearance:none;appearance:none;width:100%;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23E8742A' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 16px center;padding-right:40px;font-size:16px;color:var(--ink)}
+select.pickbtn.ph{color:#8D99AE}
 </style>
 </head>
 <body>
@@ -1259,7 +1262,7 @@ return `<div>${TOPBAR()}<div class="hero hero2" style="padding-bottom:30px">${SC
 <label class="lbl">Mobile number *</label><div style="display:flex;gap:8px"><span class="txt" style="width:64px;text-align:center;color:var(--muted)">+91</span><input class="txt" id="f_phone" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" value="${esc(r.phone||'')}" placeholder="10-digit mobile"></div>
 <label class="lbl">Email <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input class="txt" id="f_email" type="email" maxlength="80" value="${esc(r.email||'')}" placeholder="you@example.com">
 <label class="lbl">Preparing for *</label><div class="opts" id="f_exam">${EXAMS.map(x=>`<button type="button" class="tab ${r.exam===x?'on':''}" onclick="S.draft=readForm();S.draft.exam='${x}';render()">${x}</button>`).join("")}</div>
-<label class="lbl">State *</label><button type="button" class="txt pickbtn ${r.state?'':'ph'}" onclick="S.draft=readForm();pickSignupState()"><span>${r.state?esc(r.state):'Tap to choose your state'}</span><b>▾</b></button>
+<label class="lbl">State *</label><select class="txt pickbtn ${r.state?'':'ph'}" id="f_state" onchange="this.classList.toggle('ph',!this.value)"><option value="">Tap to choose your state</option>${STATES.map(x=>`<option value="${x}" ${r.state===x?'selected':''}>${x}</option>`).join("")}</select>
 <label class="lbl">Attempt year</label><div class="opts">${["2026","2027","2028"].map(y=>`<button type="button" class="tab ${String(r.year||"2026")===y?'on':''}" onclick="S.draft=readForm();S.draft.year='${y}';render()">${y}</button>`).join("")}</div></div>
 <div class="card" style="font-size:13px;line-height:1.5"><label class="chk"><input type="checkbox" id="f_consent" required ${r.consent?'checked':''}> <span>I agree that Dhaara may store my name, mobile number and study progress to run my account, show me on the leaderboard (name and surname) and contact me about my preparation. *</span></label>
 <label class="chk"><input type="checkbox" id="f_wa" ${r.wa!==false?'checked':''}> <span>Send me daily practice questions and course updates on WhatsApp/SMS. I can opt out anytime.</span></label>
@@ -1269,7 +1272,7 @@ return `<div>${TOPBAR()}<div class="hero hero2" style="padding-bottom:30px">${SC
 ${S.after?'':`<button type="button" class="more" onclick="S.skipSignup=1;store.set('dhara_skip',1);go('home')">Explore first</button>`}
 <p class="disc" style="padding:12px 4px 30px">Your details stay with Dhaara and are never sold. Dhaara is not affiliated with the Bar Council of India. <br><a href="${helpLink('sign-up')}" target="_blank" rel="noopener" style="color:var(--muted)">💬 Trouble signing up? WhatsApp us</a></p></form></div>`}
 function pickSignupState(){modal(`<h3>Choose your state</h3><p>Used for your court circuit and leaderboard.</p><div class="opts" style="margin-top:12px">${STATES.map(x=>`<button class="tab ${(S.draft&&S.draft.state)===x?'on':''}" onclick="S.draft.state='${x}';closeModal();render()">${x}</button>`).join("")}</div>`)}
-function readForm(){const v=id=>($(id)||{}).value||"";const c=id=>!!($(id)||{}).checked;return {name:v("f_name").trim(),phone:v("f_phone").trim(),email:v("f_email").trim(),exam:(S.draft&&S.draft.exam)||"AIBE",state:(S.draft&&S.draft.state)||"",year:(S.draft&&S.draft.year)||"2026",consent:c("f_consent"),wa:c("f_wa"),showPhoto:c("f_ph")}}
+function readForm(){const v=id=>($(id)||{}).value||"";const c=id=>!!($(id)||{}).checked;return {name:v("f_name").trim(),phone:v("f_phone").trim(),email:v("f_email").trim(),exam:(S.draft&&S.draft.exam)||"AIBE",state:v("f_state")||(S.draft&&S.draft.state)||"",year:(S.draft&&S.draft.year)||"2026",consent:c("f_consent"),wa:c("f_wa"),showPhoto:c("f_ph")}}
 async function doSignup(){const r=readForm(),err=$("f_err");
  if(r.name.length<2)return err.textContent="Please enter your name.";
  if(!/^[6-9]\d{9}$/.test(r.phone))return err.textContent="Please enter a valid 10-digit Indian mobile number.";
