@@ -1001,7 +1001,7 @@ const DISC=`<div class="disc">Dhaara is not affiliated with, or endorsed by, the
 /* ---------- home ---------- */
 function rankBlock(){const r=rankOf(G.xp),R=RANKS[r],N=RANKS[r+1];const pct=N?Math.round((G.xp-R.xp)/(N.xp-R.xp)*100):100;
 return `<div class="rankbar"><button class="av-wrap" onclick="S.tab='me';go('me')" aria-label="Profile">${avatar(64,r)}</button><div style="flex:1;min-width:0">
-<div class="rk">Rank ${r+1} of ${RANKS.length}</div><h3>${R.n} ${R.em}</h3><div class="xpb"><i style="width:${pct}%"></i></div>
+<div class="rk">${t2("Career level","करियर स्तर")} ${r+1} / ${RANKS.length}</div><h3>${R.n} ${R.em}</h3><div class="xpb"><i style="width:${pct}%"></i></div>
 <div class="xpt"><span>${G.xp} XP</span><span>${N?(N.xp-G.xp)+' XP to '+N.n:'Top rank!'}</span></div>
 ${G.streak?`<div class="streak">🔥 ${G.streak}-day streak</div>`:''}</div></div>`}
 const hasExp=p=>p.qs.some(q=>q.e);
