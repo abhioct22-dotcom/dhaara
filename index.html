@@ -649,6 +649,13 @@ body.hi .iq>b{font-size:16.5px;line-height:1.6}
 .jb-facts{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 14px;margin:14px 0}
 .jb-kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}.jb-kv:last-child{border-bottom:0}.jb-kv span{color:var(--muted);flex:none}.jb-kv b{text-align:right;color:var(--ink);font-weight:600}
 .jb-nw{color:#C53B33}
+
+/* ---- community ---- */
+.cm-card h4{font-size:15px;color:var(--ink);margin-bottom:10px}
+.cm-btn{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:12px;text-decoration:none;color:var(--ink);margin-bottom:8px}
+.cm-btn span{font-size:22px}.cm-btn b{display:block;font-size:14px}.cm-btn small{display:block;font-size:12px;color:var(--muted)}
+.cm-rules{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:4px}
+.rp-btn{background:none;border:0;color:var(--muted);font:600 12px Inter,system-ui,sans-serif;margin-top:8px;padding:4px 0;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -1007,7 +1014,7 @@ function badgeStrip(){return `<div class="badges">${BADGES.map(b=>`<div class="b
 function home(){const latest=PAPERS[0];const ex=PAPERS.findIndex(hasExp);
 return `<div>${TOPBAR()}<div class="hero hero2">${SCALES.replace('<svg','<svg class="bg"')}
 ${rankBlock()}</div>
-${typeof webSaveNudge==="function"?webSaveNudge():""}${typeof ownerCard==="function"?ownerCard():""}${typeof sprintCard==="function"?sprintCard():""}<div class="section" style="padding-top:${daysLeft()<=14?0:14}px">${stateCard()}</div><div class="section" style="padding-top:0">${journeyCard()}</div>${typeof blogCard==="function"?blogCard():""}${typeof jobsCard==="function"?jobsCard():""}
+${typeof webSaveNudge==="function"?webSaveNudge():""}${typeof ownerCard==="function"?ownerCard():""}${typeof sprintCard==="function"?sprintCard():""}<div class="section" style="padding-top:${daysLeft()<=14?0:14}px">${stateCard()}</div><div class="section" style="padding-top:0">${journeyCard()}</div>${typeof blogCard==="function"?blogCard():""}${typeof jobsCard==="function"?jobsCard():""}${typeof commCard==="function"?commCard():""}
 ${!profile.reg?`<div class="section"><div class="card row" style="background:#FFF4EA;border-color:#F5C9A6"><div style="font-size:26px">✍️</div><div class="meta"><h4>Create your free account</h4><p>Save progress, join the leaderboard, earn +50 XP</p></div><button class="btn sm" onclick="go('signup')">Sign up</button></div></div>`:''}
 <div class="seg" style="margin-top:18px"><div class="seg-h"><div class="b" style="background:var(--ink);color:var(--gold2)">📝</div><div><h3>AIBE Mock Tests</h3><p>Real previous-year papers in exam format · Pass at ${PASS}%</p></div></div>
 <div class="card featured"><h4>${latest.title} — Full Mock</h4><p>Most recent paper. Timed, scored and reviewed like the real exam.</p>
@@ -1032,7 +1039,7 @@ return `<div><div class="hero" style="text-align:center;padding-bottom:26px">
 <div style="display:flex;gap:8px;justify-content:center;margin-top:14px"><button class="btn sm gold" onclick="pickPhoto()">📷 ${PHOTO?'Change photo':'Add your photo'}</button>${PHOTO?`<button class="btn sm" style="background:rgba(255,255,255,.1)" onclick="PHOTO='';store.set('dhara_photo','');render()">Remove</button>`:''}</div>
 <p style="font-size:11.5px;color:#8D99AE;margin-top:8px">Your photo stays on this device. It is dressed in attire that matches your rank.</p></div>
 
-${typeof helpCard==="function"?helpCard():""}${typeof webAccountCard==="function"?webAccountCard().replace('class="section"','class="section" style="padding-bottom:0"'):""}<div class="section" style="padding-top:6px"><div class="sh"><h3>Career ladder</h3><span>${G.xp} XP</span></div><div class="card">${RANKS.map((R,i)=>{const nx=RANKS[i+1];const pc=i<r?100:i===r?(nx?Math.round((G.xp-R.xp)/(nx.xp-R.xp)*100):100):0;return `<div class="row ladder ${i<r?'past':i===r?'now':'next'}" style="padding:10px 0;${i<RANKS.length-1?'border-bottom:1px solid var(--line)':''}"><div style="width:44px;${i>r?'filter:grayscale(1);opacity:.5':''}">${avatar(40,i)}</div><div class="meta"><h4 style="font-size:14px">${R.n} ${R.em}</h4><p>${i<r?'Achieved':i===r?(nx?`You are here · ${nx.xp-G.xp} XP to <b>${nx.n}</b>`:'Top of the Bar!'):`Unlocks at ${R.xp} XP · ${R.xp-G.xp} XP to go`}</p>${i===r&&nx?`<div class="lbar"><i style="width:${pc}%"></i></div>`:''}</div><span class="lchip ${i<r?'ok':i===r?'cur':'lock'}">${i<r?'✓':i===r?'●':'🔒'}</span></div>`}).join("")}</div></div>
+${typeof helpCard==="function"?helpCard():""}${typeof commCard==="function"?commCard():""}${typeof webAccountCard==="function"?webAccountCard().replace('class="section"','class="section" style="padding-bottom:0"'):""}<div class="section" style="padding-top:6px"><div class="sh"><h3>Career ladder</h3><span>${G.xp} XP</span></div><div class="card">${RANKS.map((R,i)=>{const nx=RANKS[i+1];const pc=i<r?100:i===r?(nx?Math.round((G.xp-R.xp)/(nx.xp-R.xp)*100):100):0;return `<div class="row ladder ${i<r?'past':i===r?'now':'next'}" style="padding:10px 0;${i<RANKS.length-1?'border-bottom:1px solid var(--line)':''}"><div style="width:44px;${i>r?'filter:grayscale(1);opacity:.5':''}">${avatar(40,i)}</div><div class="meta"><h4 style="font-size:14px">${R.n} ${R.em}</h4><p>${i<r?'Achieved':i===r?(nx?`You are here · ${nx.xp-G.xp} XP to <b>${nx.n}</b>`:'Top of the Bar!'):`Unlocks at ${R.xp} XP · ${R.xp-G.xp} XP to go`}</p>${i===r&&nx?`<div class="lbar"><i style="width:${pc}%"></i></div>`:''}</div><span class="lchip ${i<r?'ok':i===r?'cur':'lock'}">${i<r?'✓':i===r?'●':'🔒'}</span></div>`}).join("")}</div></div>
 <div class="section"><div class="sh"><h3>Badges</h3><span>${G.badges.length}/${BADGES.length}</span></div>${badgeStrip()}</div>
 <div class="section"><div class="card row"><div style="font-size:22px">🌐</div><div class="meta"><h4>App language</h4><p>${LANG()==='hi'?'हिंदी':'English'}</p></div><div class="segl"><button class="${LANG()==='en'?'on':''}" onclick="setLang('en')">English</button><button class="${LANG()==='hi'?'on':''}" onclick="setLang('hi')">हिंदी</button></div></div></div>
 <div class="section"><button class="card row" style="width:100%;text-align:left" onclick="G.sound=G.sound===false;saveG();render();sfx('correct')"><div style="font-size:22px">${G.sound===false?"🔇":"🔊"}</div><div class="meta"><h4>Sounds ${G.sound===false?"OFF":"ON"}</h4><p>Soft chimes for answers, stars and celebrations</p></div><span class="tgl ${G.sound===false?"":"on"}"><i></i></span></button></div>
@@ -1145,7 +1152,7 @@ return `<div><div class="rhero"><div style="display:flex;justify-content:space-b
 <div class="c"><b>${r.pct}%</b><span>${r.c} / ${n} correct</span></div></div>
 <span class="verdict ${pass?'p':'f'}">${r.pct>=90?'🏆 Gold Gavel':r.pct>=80?'🥈 Distinction':pass?'✓ Bar Ready':'Below the '+PASS+'% pass mark'}</span>${r.review?'':`<p style="color:var(--gold2);font-size:13px;margin-top:8px">+${r.xp} XP</p>`}</div>
 <div class="rgrid"><div class="rg"><b style="color:var(--ok)">${r.c}</b><span>Correct</span></div><div class="rg"><b style="color:var(--bad)">${r.w}</b><span>Wrong</span></div><div class="rg"><b style="color:var(--muted)">${r.s}</b><span>Skipped</span></div><div class="rg"><b style="font-size:16px">${fmt(r.used)}</b><span>Time</span></div></div>
-${typeof sprintResultBox==="function"?sprintResultBox():""}
+${typeof sprintResultBox==="function"?sprintResultBox():""}${T.kind==="dm"&&typeof commMockBtn==="function"&&commMockBtn()?`<div class="section" style="padding-bottom:0">${commMockBtn()}</div>`:""}
 ${weak?`<div class="section"><div class="card row" style="background:#FFF4EA;border-color:#F5C9A6">${seal(weak[0])}<div class="meta"><h4>Weakest: ${esc(weak[0])}</h4><p>Train in the ${esc(room(weak[0])[1])} to fix it.</p></div><button class="btn sm" onclick="T=null;openChamber('${esc(weak[0])}')">Go</button></div></div>`:''}
 <div class="section"><div class="sh"><h3>Subject-wise score</h3></div><div class="card">${subs}</div></div>
 <div class="section"><div class="sh"><h3>Answers &amp; explanations</h3></div><div id="rv">${review()}</div></div>
@@ -1166,7 +1173,7 @@ const flagNote=q=>q.disputed?'<div class="fixnote" style="color:#B4600F">⚠ Ans
 function qCard(q,u,lbl){const st=u===undefined?'s':u===q.a?'c':'w';
 return `<div class="rq"><div class="qno"><span>${lbl} · ${esc(q.s)} · ${esc(q.paper)}</span><span class="tag ${st}">${st==='c'?'Correct':st==='w'?'Wrong':'Skipped'}</span></div>
 <div class="qt">${esc(QQ(q))}</div>${QO(q).map((o,k)=>`<div class="ro ${k===q.a?'right':(k===u?'wrong':'')}"><span class="l">${L[k]}</span><span>${esc(o)}${k===u?' <b style="font-size:11px;color:var(--muted)">· your answer</b>':''}</span></div>`).join("")}
-${q.e?`<div class="exp"><h5>Explanation</h5>${esc(QE(q))}${flagNote(q)}</div>`:`<div class="exp none"><h5>Correct answer: (${L[q.a]})</h5>Detailed explanation coming soon.</div>`}${bareActs(q)}</div>`}
+${q.e?`<div class="exp"><h5>Explanation</h5>${esc(QE(q))}${flagNote(q)}</div>`:`<div class="exp none"><h5>Correct answer: (${L[q.a]})</h5>Detailed explanation coming soon.</div>`}${bareActs(q)}${T&&T.qs&&T.qs.indexOf(q)>=0?`<button class="rp-btn" onclick="reportAns(${T.qs.indexOf(q)})">⚠️ Report this answer</button>`:""}</div>`}
 function bonusQs(s,i){const all=subjQs(s);const r=rng(s+"bonus"+i);const pool=all.slice();for(let k=pool.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[pool[k],pool[j]]=[pool[j],pool[k]]}return pool.slice(0,5)}
 function startBonus(i){if(needSignup("startBonus("+i+")"))return;const lm=landmark(S.subj,i);T={mode:"b",subj:S.subj,idx:i,title:"Bonus · "+lm.n,qs:bonusQs(S.subj,i),i:0,ans:{},score:0,combo:0,xp:0};tickStreak();go("prac")}
 function finishBonus(){const n=T.qs.length;G.bonus=G.bonus||{};G.bonus[T.subj]=G.bonus[T.subj]||{};const prev=G.bonus[T.subj][T.idx]||0;if(T.score>prev)G.bonus[T.subj][T.idx]=T.score;const extra=T.score===n?25:10;addXP(T.xp+extra);const lm=landmark(T.subj,T.idx);
@@ -2945,6 +2952,23 @@ function jobsCard(){const all=jobList();if(!all.length)return "";const nw=all.fi
  return `<div class="section" style="padding-top:0"><button class="bl-home jb-home" onclick="S.jcat='all';go('jobs')"><div><small>💼 ${t2("JOBS & INTERNSHIPS","नौकरियाँ व इंटर्नशिप")}${nw?` · <b class="jb-nw">${nw} ${t2("new","नए")}</b>`:""}</small><b>${t2("Openings for law students & graduates","विधि छात्रों व स्नातकों के लिए अवसर")}</b><p>${t2(`${all.length} open · ${soon} closing this week`,`${all.length} खुले · ${soon} इस सप्ताह बंद`)}</p></div><span>›</span></button></div>`}
 /* open a shared job link: …/#job=<id> */
 (function(){const m=/#job=([\w-]+)/.exec(location.hash||"");if(m)setTimeout(()=>{try{jobsLoad();S.job=m[1];go("job")}catch(e){}},1200)})();
+/* ---------- Dhaara community: links are set in community.json on the website (no rebuild needed) ---------- */
+let COMM={wa:"",tgc:"",tg:"",state:"idle"};
+function commLoad(){if(COMM.state!=="idle")return;COMM.state="loading";
+ if(typeof WEB!=="undefined"&&WEB){fetch("community.json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(d=>{if(d)Object.assign(COMM,{wa:d.wa||"",tgc:d.tgc||"",tg:d.tg||""});COMM.state="ok";if(["home","me","result"].includes(S.view))render()}).catch(()=>{COMM.state="ok"})}else COMM.state="ok"}
+function commOn(){if(COMM.state==="idle")setTimeout(commLoad,0);return !!(COMM.wa||COMM.tg||COMM.tgc)}
+function commCard(){if(!commOn())return "";
+ const b=(u,ic,en,hi,bg)=>u?`<a class="cm-btn" style="background:${bg}" href="${esc(u)}" target="_blank" rel="noopener"><span>${ic}</span><div><b>${t2(en[0],hi[0])}</b><small>${t2(en[1],hi[1])}</small></div></a>`:"";
+ return `<div class="section" style="padding-bottom:0"><div class="card cm-card"><h4>👥 ${t2("Join the Dhaara community","धारा समुदाय से जुड़ें")}</h4>
+ ${b(COMM.wa,"🟢",["WhatsApp Updates","Mock reminders, briefs, jobs · one-way"],["WhatsApp अपडेट","मॉक रिमाइंडर, ब्रीफ़, नौकरियाँ · केवल सूचना"],"#E8F8EE")}
+ ${b(COMM.tg,"✈️",["Telegram Discussion","Ask doubts, discuss mocks · moderated"],["Telegram चर्चा","डाउट पूछें, मॉक पर चर्चा · मॉडरेटेड"],"#E8F3FC")}
+ ${!COMM.tg?b(COMM.tgc,"✈️",["Telegram Updates","Same updates on Telegram"],["Telegram अपडेट","वही अपडेट Telegram पर"],"#E8F3FC"):""}
+ <p class="cm-rules">${t2("Be respectful · no promotions or PDFs · never share phone numbers. Your number stays hidden: in Telegram set Settings › Privacy › Phone number › Nobody.","सम्मान से बात करें · प्रचार या PDF नहीं · किसी का फ़ोन नंबर साझा न करें। आपका नंबर छिपा रहता है: Telegram में Settings › Privacy › Phone number › Nobody चुनें।")}</p></div></div>`}
+function commMockBtn(){if(!commOn()||!COMM.tg)return "";return `<a class="btn" style="display:block;text-align:center;margin-top:10px;background:#229ED9;text-decoration:none" href="${esc(COMM.tg)}" target="_blank" rel="noopener">✈️ ${t2("Discuss tonight's mock on Telegram","आज के मॉक पर Telegram में चर्चा करें")}</a>`}
+/* report a doubtful answer straight to the Dhaara help number, instead of arguing in groups */
+function reportAns(i){const q=(T&&T.qs||[])[i];if(!q)return;const L4="ABCD";
+ const txt=`Answer report (Dhaara)\nPaper: ${q.paper||""} · Q${(q.n!=null?q.n:i+1)}\nSubject: ${q.s||""}\nQuestion: ${String(q.q||"").slice(0,220)}\nAnswer shown: (${L4[q.a]})\nI think the correct answer is: \nReason / source: `;
+ window.open((typeof helpLink==="function"?"https://wa.me/"+HELP_WA:"https://wa.me/919211994576")+"?text="+encodeURIComponent(txt),"_blank")}
 /* ---------- owner: daily summary ---------- */
 /* each student keeps a 7-day activity log that rides along on their board doc */
 function dayStat(){const k=dkey(),D=G.day7=G.day7||{};Object.keys(D).forEach(x=>{if(x<dkey(new Date(istNow().getTime()-7*864e5)))delete D[x]});return D[k]=D[k]||{q:0,t:0,br:[]}}
