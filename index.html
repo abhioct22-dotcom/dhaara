@@ -627,6 +627,13 @@ body.hi .iq>b{font-size:16.5px;line-height:1.6}
 .ow-br>b{font-size:18px;text-align:center;min-width:44px}.ow-br>b span{display:block;font-size:10px;color:var(--muted);font-weight:500}
 .ow-tag{font-size:10px;padding:1px 6px;border-radius:8px;vertical-align:middle}.ow-tag.bad{background:#FDE7E5;color:#C53B33}
 .ow-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}.ow-row:last-child{border-bottom:0}.ow-row small{color:var(--muted)}
+
+/* ---- Google sign-up ---- */
+.gsu{text-align:center}.gsu small{display:block;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.4}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:12px;border:1px solid #C5CFDA;background:#fff;color:#1C2830;font:600 15px Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.gbtn:disabled{opacity:.6}
+.gor{display:flex;align-items:center;gap:10px;margin-top:12px;color:var(--muted);font-size:12px}.gor:before,.gor:after{content:"";flex:1;height:1px;background:var(--line)}
+.gsu.on{display:flex;gap:12px;align-items:center;text-align:left;background:#EEF8F1;border-color:#BFE3CB}.gsu.on span{font-size:22px}.gsu.on b{display:block;font-size:14px;color:#1E6B3E}.gsu.on small{margin-top:2px}
 </style>
 </head>
 <body>
@@ -640,16 +647,19 @@ const FB_CONFIG={"apiKey": "AIzaSyAK-V2z4yntqWy3_RpPE10Wc01MNk2MkSU", "authDomai
 const OWNER_HASH="1e205be5f6e675186a37129bba66d0dac79a54eb2c5a29f38e3b109bfbd79cba"; /* sha256 of the owner's Google email, filled in by the web build */
 const WEB=!!FB_CONFIG&&!(window.claude&&window.claude.use);
 let FBU=null,FBA=null;
+async function webSha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(s||"").trim().toLowerCase()));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
+async function webOwnerOf(u){return !!(u&&u.email&&u.emailVerified&&OWNER_HASH&&await webSha(u.email)===OWNER_HASH)}
 if(WEB)(function(){
  const V="10.12.2",base="https://www.gstatic.com/firebasejs/"+V+"/";
  const load=s=>new Promise((ok,no)=>{const e=document.createElement("script");e.src=base+s;e.onload=ok;e.onerror=no;document.head.appendChild(e)});
- const sha=async s=>{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(s||"").trim().toLowerCase()));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")};
+ const sha=webSha;const _unused=async s=>{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(s||"").trim().toLowerCase()));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")};
  let OWNER=false;
  const ready=(async()=>{await load("firebase-app-compat.js");await Promise.all([load("firebase-auth-compat.js"),load("firebase-firestore-compat.js")]);
   firebase.initializeApp(FB_CONFIG);FBA=firebase.auth();const db=firebase.firestore();
   try{await FBA.getRedirectResult()}catch(e){}
   let u=await new Promise(r=>{const off=FBA.onAuthStateChanged(x=>{off();r(x)})});
   if(!u)u=(await FBA.signInAnonymously()).user;
+  try{const d=sessionStorage.getItem("dhara_gdraft");if(d&&!u.isAnonymous){sessionStorage.removeItem("dhara_gdraft");const k=JSON.parse(d);setTimeout(()=>{try{if(!profile.reg){S.draft=Object.assign(k,{name:k.name||u.displayName||"",email:k.email||u.email||""});go("signup")}}catch(e){}},300)}}catch(e){}
   FBU=u;OWNER=!!(u.email&&u.emailVerified&&OWNER_HASH&&await sha(u.email)===OWNER_HASH);
   return {db,u}})();
  /* game docs are stored as one JSON string: Firestore rejects nested arrays and undefined values */
@@ -673,6 +683,24 @@ async function webSignIn(){if(!FBA)return;const p=new firebase.auth.GoogleAuthPr
 async function webSignOut(){if(!FBA)return;if(!confirm("Sign out of Dhaara on this device?"))return;await FBA.signOut();location.reload()}
 function webAccountCard(){if(!WEB)return "";const g=FBU&&!FBU.isAnonymous;
  return `<div class="section"><div class="card row"><div style="font-size:22px">${g?"✅":"🔐"}</div><div class="meta"><h4>${g?"Signed in with Google":"Save your progress"}</h4><p>${g?esc(FBU.email||""):"Sign in with Google to keep your XP, mocks and seniors safe on any phone."}</p></div>${g?`<button class="btn sm ghost" onclick="webSignOut()">Sign out</button>`:`<button class="btn sm gold" onclick="webSignIn()">Sign in with Google</button>`}</div><p style="font-size:12px;text-align:center;margin-top:8px"><a href="privacy.html" target="_blank" style="color:var(--muted)">Privacy policy</a></p></div>`}
+
+/* sign-up screen: Continue with Google fills name and email, keeps the same account (anonymous progress is kept) */
+async function webGoogleSignup(btn){if(!FBA)return;const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+ const keep=Object.assign({exam:"AIBE"},S.draft||{},typeof readForm==="function"&&document.getElementById("f_name")?readForm():{});
+ if(btn){btn.disabled=true;btn.textContent="Opening Google…"}
+ try{let res;
+  if(FBU&&FBU.isAnonymous){try{res=await FBU.linkWithPopup(p)}catch(e){
+    if(e&&e.code==="auth/credential-already-in-use"&&e.credential){await FBA.signInWithCredential(e.credential);location.reload();return}
+    if(e&&/popup-blocked|operation-not-supported/.test(e.code||"")){S.draft=keep;try{sessionStorage.setItem("dhara_gdraft",JSON.stringify(keep))}catch(x){}return FBU.linkWithRedirect(p)}
+    throw e}}
+  else res=await FBA.signInWithPopup(p);
+  FBU=res.user;try{IS_OWNER=await webOwnerOf(FBU)}catch(e){}
+  S.draft=Object.assign(keep,{name:keep.name||FBU.displayName||"",email:keep.email||FBU.email||""});render()}
+ catch(e){if(btn){btn.disabled=false;btn.innerHTML=GBTN}if(!(e&&/popup-closed|cancelled-popup/.test(e.code||"")))alert("Google sign-in didn't complete: "+(e&&e.message||e))}}
+const GBTN=`<svg width="18" height="18" viewBox="0 0 48 48" style="flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.7 6c4.5-4.2 6.9-10.3 6.9-17.7z"/><path fill="#FBBC05" d="M10.6 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.7-6c-2.1 1.4-4.9 2.3-8.2 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg><span>Continue with Google</span>`;
+function webSignupCard(){if(!WEB)return "";const g=FBU&&!FBU.isAnonymous;
+ if(g)return `<div class="card gsu on"><span>✅</span><div><b>Signed in with Google</b><small>${esc(FBU.email||"")} · your progress is saved to this account</small></div></div>`;
+ return `<div class="card gsu"><button type="button" class="gbtn" onclick="webGoogleSignup(this)">${GBTN}</button><small>Fastest way: fills your name and email, and keeps your progress safe on any phone.</small><div class="gor"><span>or fill in below</span></div></div>`}
 
 /* ---------- Hindi glossary: adds the English legal term in brackets after a Hindi technical term (first use in each text) ---------- */
 const HI_GLOSS=[["न्यायिक पुनर्विलोकन", "judicial review"], ["न्यायालय की अवमानना", "contempt of court"], ["अस्थायी निषेधाज्ञा", "temporary injunction"], ["बंदी प्रत्यक्षीकरण", "habeas corpus"], ["प्रत्यायोजित विधान", "delegated legislation"], ["प्रतिनिधिक दायित्व", "vicarious liability"], ["स्थायी निषेधाज्ञा", "permanent injunction"], ["व्यावसायिक कदाचार", "professional misconduct"], ["आपराधिक षड्यंत्र", "criminal conspiracy"], ["आत्यंतिक दायित्व", "absolute liability"], ["विनिर्दिष्ट पालन", "specific performance"], ["संक्षिप्त विचारण", "summary trial"], ["विचाराधीन न्याय", "res sub judice"], ["आपराधिक मानव वध", "culpable homicide"], ["मृत्युकालिक कथन", "dying declaration"], ["प्राकृतिक न्याय", "natural justice"], ["विधिक प्रतिनिधि", "legal representative"], ["प्रतिलिप्यधिकार", "copyright"], ["परक्राम्य लिखत", "negotiable instrument"], ["औद्योगिक विवाद", "industrial dispute"], ["अधिकार-क्षेत्र", "jurisdiction"], ["अग्रिम ज़मानत", "anticipatory bail"], ["अधिकार-पृच्छा", "quo warranto"], ["अधिकार पृच्छा", "quo warranto"], ["विवाह-विच्छेद", "divorce"], ["व्यापार चिह्न", "trade mark"], ["संपत्ति अंतरण", "transfer of property"], ["आजीवन कारावास", "life imprisonment"], ["सत्र न्यायालय", "Sessions Court"], ["अग्रिम जमानत", "anticipatory bail"], ["प्रतिपरीक्षा", "cross-examination"], ["सेवा में कमी", "deficiency in service"], ["कठोर दायित्व", "strict liability"], ["दाखिल-ख़ारिज", "mutation"], ["प्रतिषेध रिट", "writ of prohibition"], ["महान्यायवादी", "Attorney General"], ["शोधन अक्षमता", "insolvency"], ["चेक का अनादर", "dishonour of cheque"], ["पूर्व-न्याय", "res judicata"], ["पूर्व न्याय", "res judicata"], ["प्राङ्न्याय", "res judicata"], ["पुनर्विलोकन", "review"], ["दत्तक ग्रहण", "adoption"], ["सबूत का भार", "burden of proof"], ["असम्यक् असर", "undue influence"], ["क्षतिपूर्ति", "indemnity"], ["प्रत्याभूति", "guarantee"], ["भविष्य निधि", "provident fund"], ["उत्तराधिकार", "succession"], ["लोक अभियोजक", "Public Prosecutor"], ["प्रत्यर्थी", "respondent"], ["निषेधाज्ञा", "injunction"], ["संस्वीकृति", "confession"], ["माध्यस्थम्", "arbitration"], ["अंतर्वर्ती", "interlocutory"], ["दुष्प्रेरण", "abetment"], ["असम्यक असर", "undue influence"], ["शून्यकरणीय", "voidable"], ["भूमि अर्जन", "land acquisition"], ["महाधिवक्ता", "Advocate General"], ["परिसंपत्ति", "asset"], ["लिखित कथन", "written statement"], ["अपीलार्थी", "appellant"], ["आरोप-पत्र", "charge sheet"], ["उत्प्रेषण", "certiorari"], ["माध्यस्थम", "arbitration"], ["पुनरीक्षण", "revision"], ["निर्वसीयत", "intestate"], ["अधिकारिता", "jurisdiction"], ["दोषसिद्धि", "conviction"], ["दोषमुक्ति", "acquittal"], ["परिवीक्षा", "probation"], ["प्रतिदावा", "counter-claim"], ["मृत्युदंड", "death penalty"], ["अजमानतीय", "non-bailable"], ["असंज्ञेय", "non-cognizable"], ["अभियुक्त", "accused"], ["सहदायिकी", "coparcenary"], ["आरोपपत्र", "charge sheet"], ["वाद-कारण", "cause of action"], ["वादहेतुक", "cause of action"], ["मध्यस्थम", "arbitration"], ["भरण-पोषण", "maintenance"], ["प्रपीड़न", "coercion"], ["निष्पादन", "execution"], ["अध्यादेश", "ordinance"], ["तालाबंदी", "lock-out"], ["अभिकर्ता", "agent"], ["समनुदेशन", "assignment"], ["नामांतरण", "mutation"], ["जमानतीय", "bailable"], ["संज्ञेय", "cognizable"], ["वादपत्र", "plaint"], ["परिवादी", "complainant"], ["सहदायिक", "coparcener"], ["व्यादेश", "injunction"], ["अपकृत्य", "tort"], ["प्रतिफल", "consideration"], ["परिसीमा", "limitation"], ["परमादेश", "mandamus"], ["मानहानि", "defamation"], ["सुखाचार", "easement"], ["भरणपोषण", "maintenance"], ["उपधारणा", "presumption"], ["सुसंगति", "relevancy"], ["उपनिधान", "bailment"], ["अन्वेषण", "investigation"], ["उन्मोचन", "discharge"], ["कामबंदी", "lay-off"], ["कर्मकार", "workman"], ["प्रतिकर", "compensation"], ["प्रतिभू", "surety"], ["निर्वचन", "interpretation"], ["अवमानना", "contempt"], ["अभियोजन", "prosecution"], ["ज़मानत", "bail"], ["अभिवचन", "pleading"], ["न्यासी", "trustee"], ["अवयस्क", "minor"], ["कुर्की", "attachment"], ["विचारण", "trial"], ["अतिचार", "trespass"], ["कदाचार", "misconduct"], ["अभिकरण", "agency"], ["अनुबंध", "contract"], ["संविदा", "contract"], ["अपराधी", "offender"], ["साम्या", "equity"], ["समादेश", "writ"], ["दिवाला", "insolvency"], ["जमानत", "bail"], ["विबंध", "estoppel"], ["पंचाट", "award"], ["गिरवी", "pledge"], ["उपताप", "nuisance"], ["मुजरा", "set-off"], ["छँटनी", "retrenchment"], ["छंटनी", "retrenchment"], ["उपदान", "gratuity"], ["वसीयत", "will"], ["बंधक", "mortgage"], ["शमन", "compounding"]];
@@ -1174,7 +1202,7 @@ function needSignup(after){if(profile.reg)return false;S.after=after;go("signup"
 function signup(){const r=S.draft||{exam:"AIBE"};
 return `<div>${TOPBAR()}<div class="hero hero2" style="padding-bottom:30px">${SCALES.replace('<svg','<svg class="bg"')}
 <h2 style="margin-top:4px">Join the Bar of<br><em>future advocates.</em></h2><p style="color:#C3CCE6;font-size:14px;margin-top:6px">Free account · 1,600+ AIBE PYQs · Mocks, chambers &amp; leaderboard</p></div>
-<form class="section" id="sf" onsubmit="event.preventDefault();doSignup()">
+<form class="section" id="sf" onsubmit="event.preventDefault();doSignup()">${typeof webSignupCard==="function"?webSignupCard():""}
 <div class="card"><label class="lbl">Full name *</label><input class="txt" id="f_name" required maxlength="60" autocomplete="name" value="${esc(r.name||profile.name||'')}" placeholder="As you'd like it on your award cards">
 <label class="lbl">Mobile number *</label><div style="display:flex;gap:8px"><span class="txt" style="width:64px;text-align:center;color:var(--muted)">+91</span><input class="txt" id="f_phone" required inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" value="${esc(r.phone||'')}" placeholder="10-digit mobile"></div>
 <label class="lbl">Email <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input class="txt" id="f_email" type="email" maxlength="80" value="${esc(r.email||'')}" placeholder="you@example.com">
