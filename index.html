@@ -1098,7 +1098,7 @@ function askQuit(){modal(`<h3>Exit the exam?</h3><p>This attempt will not be sav
 function submitExam(auto){clearInterval(timerId);closeModal();if(!T||T.res)return;let c=0,w=0;const bs={};
 T.qs.forEach((q,i)=>{bs[q.s]=bs[q.s]||{c:0,n:0};bs[q.s].n++;if(T.ans[i]===undefined)return;if(T.ans[i]===q.a){c++;bs[q.s].c++}else w++});
 const pct=Math.round(c/T.qs.length*100);T.res={c,w,s:T.qs.length-c-w,pct,used:Math.min(T.total,Math.round((Date.now()-T.start)/1000)),bs,auto};
-const tier=pct>=90?3:pct>=80?2:pct>=PASS?1:0;const bonus=[0,100,200,300][tier];T.res.xp=c*10+bonus;T.res.bonus=bonus;let nb=[];try{if(typeof sprintRecord==="function")sprintRecord(T)}catch(e){}try{addSolved(c+w)}catch(e){}try{clearTimeout(syncTimer);setTimeout(syncNow,800)}catch(e){}
+const tier=pct>=90?3:pct>=80?2:pct>=PASS?1:0;const bonus=[0,100,200,300][tier];T.res.xp=c*10+bonus;T.res.bonus=bonus;let nb=[];try{if(typeof sprintRecord==="function")sprintRecord(T)}catch(e){}try{setTimeout(()=>{if(typeof syncNow==="function"){clearTimeout(syncTimer);syncTimer=null;syncNow()}},800)}catch(e){}try{addSolved(c+w)}catch(e){}try{clearTimeout(syncTimer);setTimeout(syncNow,800)}catch(e){}
 try{history.push({t:T.title,at:Date.now(),pct,c,att:c+w});store.set("dhara_hist2",history)}catch(e){}
 try{nb=[award("first"),tier>=1&&award("pass"),tier>=2&&award("dist"),tier>=3&&award("gold")].filter(Boolean);addXP(T.res.xp)}catch(e){}
 S.filter="all";S.shown=30;go("result");window.scrollTo(0,0);try{celebrate(tier,nb)}catch(e){}}
@@ -1170,14 +1170,14 @@ let SYNC_FAIL=false;
 let BANNED=[];let DB=null,USER=null,UID=null,IS_OWNER=false,BOARD=[],BOARD_STATE="local",ADMIN=null;
 const WK=()=>Math.floor((Date.now()/864e5+3)/7);
 let syncBusy=false,syncAgain=false,syncTimer=null;
-function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,T&&T.res==null&&S.view==="exam"?45000:12000)}
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){clearTimeout(syncTimer);syncNow()}});let LAST_BOARD="";
+function scheduleSync(){if(syncTimer)return;syncTimer=setTimeout(()=>{syncTimer=null;syncNow()},T&&T.res==null&&S.view==="exam"?300000:60000)}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){clearTimeout(syncTimer);syncTimer=null;syncNow()}});let LAST_BOARD="",LAST_GAME="";
 async function syncNow(){if(!DB||!UID||!profile.reg)return;if(BANNED.includes(UID))return;if(syncBusy){syncAgain=true;return}syncBusy=true;
  try{const r=rankOf(G.xp);if(G.wk!==WK()){G.wk=WK();G.wxp=0}
   const best=history.reduce((a,h)=>Math.max(a,h.pct),0);
   const bd={name:displayName(),xp:G.xp,rank:r,wk:G.wk,wxp:G.wxp||0,best,exam:profile.reg.exam,state:homeState(),lang:LANG(),photo:profile.reg.showPhoto?thumb():"",dm:(G.sp&&G.sp.rk)||null};try{dayStat();Object.assign(bd,boardExtras())}catch(e){}const bk=JSON.stringify(bd);
   if(bk!==LAST_BOARD){await DB.doc("board/"+UID).set(Object.assign(bd,{at:Date.now()}));LAST_BOARD=bk}
-  await DB.doc("data/users/"+UID+"/game").set({G:JSON.parse(JSON.stringify(G)),history:history.slice(-50)});SYNC_FAIL=false;
+  const gd={G:JSON.parse(JSON.stringify(G)),history:history.slice(-50)},gk=JSON.stringify(gd);if(gk!==LAST_GAME){await DB.doc("data/users/"+UID+"/game").set(gd);LAST_GAME=gk}SYNC_FAIL=false;
  }catch(e){SYNC_FAIL=true}
  syncBusy=false;if(syncAgain){syncAgain=false;scheduleSync()}}
 function displayName(){return (profile.reg&&profile.reg.name||profile.name||"Student").trim().replace(/\s+/g," ").slice(0,32)}
@@ -1189,8 +1189,7 @@ function displayName(){return (profile.reg&&profile.reg.name||profile.name||"Stu
  try{const g=await DB.doc("data/users/"+UID+"/game").get();if(g.exists){const d=g.data();if(d.G&&(d.G.xp||0)>G.xp){G=Object.assign({},G,d.G);store.set("dhara_game",G)}if(d.history&&d.history.length>history.length){history=d.history.slice();store.set("dhara_hist2",history)}}}catch(e){}
  try{const s=await DB.doc("students/"+UID).get();if(s.exists&&!profile.reg){profile.reg=s.data();profile.name=profile.reg.name;store.set("dhara_profile",profile)}}catch(e){}
  try{DB.doc("mod/list").onSnapshot(d=>{BANNED=(d.exists&&d.data().ban)||[];BOARD=BOARD.filter(r=>!BANNED.includes(r.id));if(S.view==="board"||S.view==="admin")render()},()=>{})}catch(e){}
- BOARD_STATE="loading";const to=setTimeout(()=>{if(BOARD_STATE==="loading"){BOARD_STATE="slow";if(S.view==="board")render()}},10000);
- DB.collection("board").orderBy("xp","desc").limit(150).onSnapshot(snap=>{clearTimeout(to);BOARD=snap.docs.map(d=>Object.assign({id:d.id},d.data())).filter(r=>!BANNED.includes(r.id));BOARD_STATE="live";if(S.view==="board"||S.view==="home")render()},e=>{clearTimeout(to);BOARD_STATE="off";if(S.view==="board")render()});
+ BOARD_STATE="ok";if(S.view==="board"||S.view==="home"||S.view==="sprint")ensureBoard(S.view==="board"?(S.btab||"week"):"all");
  if(profile.reg)scheduleSync();
  render();
 }catch(e){}})();
@@ -1226,7 +1225,7 @@ async function doSignup(){const r=readForm(),err=$("f_err");
  if(!r.consent)return err.textContent="Please accept the consent to create your account.";
  r.createdAt=Date.now();r.source="app";profile.reg=r;profile.name=r.name;store.set("dhara_profile",profile);S.draft=null;
  if(DB&&UID){try{await DB.doc("students/"+UID).set(r);SYNC_FAIL=false}catch(e){SYNC_FAIL=true}}
- award("first_day");addXP(50);sfx("pass");scheduleSync();
+ award("first_day");addXP(50);sfx("pass");setTimeout(()=>{clearTimeout(syncTimer);syncTimer=null;syncNow()},500);
  const after=S.after;S.after=null;go("home");
  overlay(`<div class="trophy" style="display:flex;justify-content:center">${avatar(130,rankOf(G.xp))}</div><div class="tier">Welcome to Dhaara</div><h2>Namaste, ${esc(r.name.split(" ")[0])}!</h2><p>Your journey from Law Student to Senior Advocate starts now. +50 XP joining bonus.</p>${!PHOTO?`<button class="btn ghost" style="margin-bottom:8px" onclick="closeCele();pickPhoto()">📷 Add my photo</button>`:''}<button class="btn gold" onclick="closeCele();${after?after:''}">${after?'Continue':"Let's begin"}</button>`,80)}
 
@@ -1234,7 +1233,7 @@ async function doSignup(){const r=readForm(),err=$("f_err");
 const LTAG=r=>"";const LTAG_OLD=r=>`<span class="ltag ${r.lang==="hi"?"h":"e"}" title="${r.lang==="hi"?"Attempts in Hindi":"Attempts in English"}">${r.lang==="hi"?"H":"E"}</span>`;
 function pickBoardState(){const cnt={};BOARD.forEach(r=>{if(r.state)cnt[r.state]=(cnt[r.state]||0)+1});const v=S.bview||homeState();
  modal(`<h3>View a state leaderboard</h3><p>Your own rank counts in <b>${esc(homeState())}</b>.</p><div class="opts" style="margin-top:12px">${STATES.filter(x=>x!=="Other").map(x=>`<button class="tab ${v===x?'on':''}" onclick="S.bview='${x}';closeModal();render()">${x}${cnt[x]?` · ${cnt[x]}`:''}${x===homeState()?' ★':''}</button>`).join("")}</div>`)}
-function board(){const tab=S.btab||"week",wk=WK();
+function board(){const tab=S.btab||"week",wk=WK();setTimeout(()=>ensureBoard(tab),0);
  const view=S.bview||homeState();let rows=BOARD.slice();if(tab==="state")rows=rows.filter(r=>r.state===view);if(tab==="week")rows=rows.filter(r=>r.wk===wk&&(r.wxp||0)>0).sort((a,b)=>(b.wxp||0)-(a.wxp||0));
  const val=r=>tab==="week"?(r.wxp||0):(r.xp||0);
  let meIn=UID&&rows.some(r=>r.id===UID);
@@ -1242,7 +1241,7 @@ function board(){const tab=S.btab||"week",wk=WK();
  const myPos=rows.findIndex(r=>r.id===(UID||"me"));
  const pod=rows.slice(0,3),rest=rows.slice(3,100);
  const face=(r,s)=>r.photo?`<img src="${esc(r.photo)}" style="width:${s}px;height:${s}px;border-radius:50%;object-fit:cover;border:2px solid #FFC84A">`:`<div style="width:${s}px;height:${s}px;border-radius:50%;background:#E9C9A8;color:#7A4F2E;display:grid;place-items:center;font-weight:700;font-family:'Source Serif 4',serif;font-size:${s*.42}px;border:2px solid #FFC84A">${esc((r.name||"?")[0])}</div>`;
- const note=BOARD_STATE==="live"?"Live":BOARD_STATE==="loading"?"Loading…":BOARD_STATE==="slow"?"Can't reach the leaderboard yet":"Live leaderboard isn't available in this view: you're seeing your own score only.";
+ const note=BOARD_STATE==="ok"?`${boardAge(tab)||"Loading…"} · <button onclick="boardRefresh()" style="background:none;border:0;color:#FFC84A;font:inherit;text-decoration:underline;cursor:pointer;padding:0">↻ Refresh</button>`:BOARD_STATE==="loading"?"Loading…":BOARD_STATE==="slow"?"Can't reach the leaderboard yet":"Live leaderboard isn't available in this view: you're seeing your own score only.";
  const order=[1,0,2];
  const WARN=!DB?`<div class="syncwarn">⚠️ You're viewing offline — your score is saved on this device only. Sign in to Claude to appear on the shared leaderboard.</div>`:SYNC_FAIL?`<div class="syncwarn">⚠️ Your score couldn't be posted. Ask the person who shared this link to give you "can interact" access.</div>`:"";
  return `${WARN}<div><div class="hero" style="padding-bottom:22px;text-align:center"><h2 style="font-size:26px">Leaderboard 🏆</h2><p style="color:#C3CCE6;font-size:13px">${note}</p>
@@ -1280,6 +1279,21 @@ let THUMB=store.get("dhara_thumb40","");
 function thumb(){if(!PHOTO)return "";if(THUMB&&store.get("dhara_thumb40_src",0)===PHOTO.length)return THUMB;
  const im=new Image();im.onload=()=>{const cv=document.createElement("canvas");cv.width=cv.height=40;cv.getContext("2d").drawImage(im,0,0,40,40);THUMB=cv.toDataURL("image/jpeg",.6);store.set("dhara_thumb40",THUMB);store.set("dhara_thumb40_src",PHOTO.length);scheduleSync()};im.src=PHOTO;return THUMB||""}
 async function modBan(id,on){if(!DB||!IS_OWNER)return;const s=new Set(BANNED);on?s.add(id):s.delete(id);try{await DB.doc("mod/list").set({ban:[...s],at:Date.now()});if(on)await DB.doc("board/"+id).delete()}catch(e){alert("Couldn't update: "+e)}render()}
+
+/* ---------- leaderboard: loaded on demand, top rows only, reused for 10 minutes ---------- */
+const BOARD_TTL=10*60*1000;let BMAP={},BAT={},BBUSY={};
+function boardKey(kind){return kind==="state"?"state:"+(S.bview||homeState()):kind==="dm"?"dm:"+dkey():kind}
+function ensureBoard(kind,force){if(!DB)return;const key=boardKey(kind);if(BBUSY[key])return;if(!force&&BAT[key]&&Date.now()-BAT[key]<BOARD_TTL)return;BBUSY[key]=1;
+ let q;const col=DB.collection("board");
+ if(kind==="week")q=col.orderBy("wxp","desc").limit(60);
+ else if(kind==="state")q=col.where("state","==",S.bview||homeState()).limit(60);
+ else if(kind==="dm")q=col.where("dm.d","==",dkey()).limit(100);
+ else q=col.orderBy("xp","desc").limit(50);
+ BOARD_STATE=BOARD.length?"ok":"loading";
+ q.get().then(s=>{s.docs.forEach(d=>{BMAP[d.id]=Object.assign({id:d.id},d.data())});BOARD=Object.values(BMAP).filter(r=>!BANNED.includes(r.id));BAT[key]=Date.now();BOARD_STATE="ok";BBUSY[key]=0;if(["board","home","sprint","result"].includes(S.view))render()})
+  .catch(e=>{BBUSY[key]=0;BOARD_STATE=BOARD.length?"ok":"slow";if(S.view==="board")render()})}
+function boardAge(kind){const t=BAT[boardKey(kind)];if(!t)return "";const m=Math.round((Date.now()-t)/6e4);return m<1?"Updated just now":"Updated "+m+" min ago"}
+function boardRefresh(){const k=S.btab||"week";BAT[boardKey(k)]=0;ensureBoard(k,true);floatFx&&floatFx("Refreshing…")}
 
 /* ---------- soft sound design (Web Audio, synthesized, low volume) ---------- */
 let AC=null;
@@ -2239,7 +2253,7 @@ function sprintStreak(){let n=0,d=istNow();const sp=SP();for(;;){const k=dkey(d)
 function dayDone(k){const x=SP().days[k];return !!(x&&(x.dr||x.full)) }
 
 /* daily leaderboard: built from the shared board docs (field dm) */
-function dmBoard(k){const rows=BOARD.filter(r=>r.dm&&r.dm.d===k).map(r=>({id:r.id,name:r.name,state:r.state,c:r.dm.c,n:r.dm.n,used:r.dm.used}));
+function dmBoard(k){if(k===dkey())setTimeout(()=>ensureBoard("dm"),0);const rows=BOARD.filter(r=>r.dm&&r.dm.d===k).map(r=>({id:r.id,name:r.name,state:r.state,c:r.dm.c,n:r.dm.n,used:r.dm.used}));
  const me=SP().days[k]&&SP().days[k].dm;if(me&&profile.reg&&!rows.some(r=>r.id===(UID||"me")))rows.push({id:UID||"me",name:displayName(),state:homeState(),c:me.c,n:me.n,used:me.used});
  return rows.sort((a,b)=>b.c-a.c||a.used-b.used)}
 
