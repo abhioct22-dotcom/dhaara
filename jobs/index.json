@@ -1,5 +1,5 @@
 {
- "at": "2026-11-16",
+ "at": "2026-11-17",
  "jobs": [
   {
    "id": "aphc-cj-2026",
@@ -364,6 +364,162 @@
      "मध्य प्रदेश उच्च न्यायालय · आधिकारिक वेबसाइट"
     ]
    }
+  },
+  {
+   "added": "2026-11-17",
+   "cat": "clerk",
+   "elig": [
+    "Indian citizen with a regular 5-year or 3-year LL.B. passed within two years before the notification; under 30 years as on 1 July; comfortable with legal databases like SCC Online or Manupatra; not doing another course or job.",
+    "भारतीय नागरिक, नियमित 5-वर्षीय या 3-वर्षीय LL.B. जो अधिसूचना (notification) से पहले के दो वर्षों में पास किया हो; 1 जुलाई को आयु 30 वर्ष से कम; SCC Online या Manupatra जैसे लीगल डेटाबेस चलाना आता हो; साथ में कोई और कोर्स या नौकरी नहीं।"
+   ],
+   "how": [
+    "Offline: download the form from tg.tshc.gov.in, attach copies of certificates attested by a Gazetted Officer and an attested photo, and send by registered post (acknowledgement due) to the Registrar General, marked 'Application for the post of Research Assistants (Law)'.",
+    "ऑफ़लाइन: tg.tshc.gov.in से फ़ॉर्म डाउनलोड करें, राजपत्रित अधिकारी (Gazetted Officer) से सत्यापित प्रमाणपत्रों की प्रतियाँ और सत्यापित फ़ोटो लगाएँ, और रजिस्टर्ड डाक (पावती सहित) से रजिस्ट्रार जनरल को भेजें; लिफ़ाफ़े पर 'Application for the post of Research Assistants (Law)' लिखें।"
+   ],
+   "id": "tshc-ra-2026",
+   "last": "2026-11-30",
+   "lastTxt": [
+    "30 Nov 2026, 5 pm (application must reach the Registry)",
+    "30 नवंबर 2026, शाम 5 बजे (आवेदन रजिस्ट्री तक पहुँच जाना चाहिए)"
+   ],
+   "loc": [
+    "Hyderabad and Secunderabad, Telangana",
+    "हैदराबाद और सिकंदराबाद, तेलंगाना"
+   ],
+   "off": {
+    "n": [
+     "High Court for the State of Telangana · Notification 29/SO/2026 (PDF)",
+     "तेलंगाना उच्च न्यायालय · अधिसूचना 29/SO/2026 (PDF)"
+    ],
+    "u": "https://tg.tshc.gov.in/documents/splofficer_2026_10_28T17_09_48.pdf"
+   },
+   "org": [
+    "High Court for the State of Telangana, Hyderabad",
+    "तेलंगाना राज्य उच्च न्यायालय, हैदराबाद"
+   ],
+   "pay": [
+    "Fixed monthly remuneration on a one-year contract; check the High Court's notices for the current amount",
+    "एक वर्ष के अनुबंध (contract) पर निश्चित मासिक पारिश्रमिक; वर्तमान राशि हाई कोर्ट की सूचनाओं में देखें"
+   ],
+   "posts": "16 (14 High Court, 2 State Judicial Academy)",
+   "ref": "Notification No. 29/SO/2026 (Roc. No. 2435/SO/2026) dated 27 Oct 2026",
+   "sel": [
+    "The notification does not spell out the process; shortlisted candidates will be informed by the High Court.",
+    "अधिसूचना में प्रक्रिया नहीं बताई गई है; चयनित उम्मीदवारों को हाई कोर्ट सूचित करेगा।"
+   ],
+   "st": "open",
+   "t": [
+    "Research Assistant (Law), Telangana High Court",
+    "रिसर्च असिस्टेंट (लॉ), तेलंगाना उच्च न्यायालय"
+   ],
+   "why": [
+    "A year inside a High Court judge's chamber is excellent practice for judiciary mains and interviews.",
+    "हाई कोर्ट के जज के चैंबर में एक वर्ष न्यायिक सेवा की मुख्य परीक्षा और इंटरव्यू के लिए बेहतरीन अभ्यास है।"
+   ]
+  },
+  {
+   "added": "2026-11-17",
+   "cat": "intern",
+   "elig": [
+    "Law students who have finished at least 2 years of a 5-year course or 1 year of a 3-year course; postgraduate law students and scholars too. One internship per financial year.",
+    "विधि छात्र जिन्होंने 5-वर्षीय कोर्स के कम से कम 2 वर्ष या 3-वर्षीय कोर्स का कम से कम 1 वर्ष पूरा किया हो; LL.M. छात्र और शोधार्थी भी। एक वित्त वर्ष में एक ही बार।"
+   ],
+   "how": [
+    "Email the prescribed form (Appendix A of the notice) with your CV, college ID, a signed and stamped recommendation from your dean or professor, and your latest marksheet. Incomplete applications are rejected.",
+    "नोटिस के परिशिष्ट A वाला फ़ॉर्म ईमेल करें, साथ में CV, कॉलेज ID, डीन या प्रोफ़ेसर का हस्ताक्षरित-मुहरयुक्त सिफ़ारिश पत्र (recommendation letter) और ताज़ा मार्कशीट। अधूरे आवेदन रद्द होंगे।"
+   ],
+   "id": "lci-intern",
+   "last": "",
+   "lastTxt": [
+    "Open all year; apply at least two months before the month you want to start",
+    "पूरे वर्ष खुला; जिस महीने शुरू करना है उससे कम से कम दो महीने पहले आवेदन करें"
+   ],
+   "loc": [
+    "New Delhi",
+    "नई दिल्ली"
+   ],
+   "off": {
+    "n": [
+     "Law Commission of India · Voluntary Internship Scheme",
+     "भारत का विधि आयोग · स्वैच्छिक इंटर्नशिप योजना"
+    ],
+    "u": "https://lawcommissionofindia.nic.in/notice/voluntary-internship-scheme/"
+   },
+   "org": [
+    "Law Commission of India, Ministry of Law and Justice",
+    "भारत का विधि आयोग, विधि एवं न्याय मंत्रालय"
+   ],
+   "pay": [
+    "Unpaid; interns bear their own travel and stay and bring their own laptop",
+    "अवैतनिक (unpaid); यात्रा और रहने का खर्च स्वयं, अपना लैपटॉप साथ लाएँ"
+   ],
+   "posts": "Up to about 12 interns at a time",
+   "ref": "Notice No. A-60011/156/2026-LC dated 22 Jun 2026 (scheme effective 1 Sep 2026)",
+   "sel": [
+    "Based on marks, the statement of purpose and slots free; senior students get preference when a month is crowded. Usually 4 weeks, extendable to 8.",
+    "अंक, उद्देश्य-विवरण (statement of purpose) और खाली स्लॉट के आधार पर; भीड़ होने पर ऊँची कक्षा वालों को प्राथमिकता। सामान्यतः 4 सप्ताह, 8 तक बढ़ सकती है।"
+   ],
+   "st": "rolling",
+   "t": [
+    "Voluntary Internship, Law Commission of India",
+    "स्वैच्छिक इंटर्नशिप, भारत का विधि आयोग"
+   ],
+   "why": [
+    "Research work on law reform at a national body is a strong CV line and builds the reading habit judiciary exams need.",
+    "राष्ट्रीय संस्था में विधि सुधार पर शोध CV को मज़बूत करता है और न्यायिक परीक्षाओं के लिए ज़रूरी पढ़ने की आदत बनाता है।"
+   ]
+  },
+  {
+   "added": "2026-11-17",
+   "cat": "faculty",
+   "elig": [
+    "Indian citizen with an LL.M. specialising in legal history or an M.A. in History with 55%, or a Ph.D. in constitutional history; UGC norms are the minimum.",
+    "भारतीय नागरिक; विधिक इतिहास में विशेषज्ञता वाला LL.M. या 55% के साथ इतिहास में M.A., या संवैधानिक इतिहास में Ph.D.; UGC मानदंड न्यूनतम शर्त हैं।"
+   ],
+   "how": [
+    "Download the form from the CNLU recruitment page, fill it, and upload the scanned copy through the Google Form given in the advertisement.",
+    "CNLU के भर्ती पेज से फ़ॉर्म डाउनलोड करें, भरें और विज्ञापन में दिए Google Form से स्कैन कॉपी अपलोड करें।"
+   ],
+   "id": "cnlu-ap-history-2026",
+   "last": "2026-11-21",
+   "lastTxt": [
+    "21 Nov 2026",
+    "21 नवंबर 2026"
+   ],
+   "loc": [
+    "Patna, Bihar",
+    "पटना, बिहार"
+   ],
+   "off": {
+    "n": [
+     "Chanakya National Law University · recruitment notices",
+     "चाणक्य राष्ट्रीय विधि विश्वविद्यालय · भर्ती सूचनाएँ"
+    ],
+    "u": "https://www.cnlu.ac.in/recruitment-notice/"
+   },
+   "org": [
+    "Chanakya National Law University, Patna",
+    "चाणक्य राष्ट्रीय विधि विश्वविद्यालय, पटना"
+   ],
+   "pay": [
+    "Not stated in the advertisement",
+    "विज्ञापन में नहीं बताया गया"
+   ],
+   "posts": "1 (contract)",
+   "ref": "Rolling Advertisement No. 52/2026-27 (Appt.) dated 12 Nov 2026",
+   "sel": [
+    "Screening, then interview (may be online). The university may instead offer a Research Associate or Lecturer post.",
+    "स्क्रीनिंग, फिर इंटरव्यू (ऑनलाइन भी हो सकता है)। विश्वविद्यालय इसके बदले रिसर्च एसोसिएट या लेक्चरर पद भी दे सकता है।"
+   ],
+   "st": "open",
+   "t": [
+    "Assistant Professor (Law, Legal and Constitutional History), CNLU Patna",
+    "असिस्टेंट प्रोफ़ेसर (विधि, विधिक एवं संवैधानिक इतिहास), CNLU पटना"
+   ],
+   "why": [
+    "A rare NLU teaching opening for LL.M. holders interested in legal history; deadline is very close.",
+    "विधिक इतिहास में रुचि रखने वाले LL.M. धारकों के लिए NLU में पढ़ाने का दुर्लभ अवसर; अंतिम तिथि बहुत पास है।"
+   ]
   }
  ]
 }
