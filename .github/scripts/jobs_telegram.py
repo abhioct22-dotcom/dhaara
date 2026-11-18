@@ -51,6 +51,9 @@ def main():
         old = {j["id"] for j in load("HEAD~1")}
         pick = [j for j in now if j["id"] not in old and j.get("st") != "closed"]
         head = f"🆕 <b>New on Dhaara Jobs</b> · {today.strftime('%d %b %Y')}"
+    elif mode == "all":
+        pick = [j for j in now if j.get("st") != "closed"]
+        head = f"📢 <b>Open jobs &amp; internships for law students</b> · {today.strftime('%d %b %Y')}"
     else:
         target = (today + timedelta(days=3)).isoformat()
         pick = [j for j in now if j.get("st") == "open" and j.get("last") == target]

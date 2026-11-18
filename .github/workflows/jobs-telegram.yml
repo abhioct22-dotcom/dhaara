@@ -6,6 +6,12 @@ on:
   schedule:
     - cron: "40 5 * * *"   # 11:10 am IST daily: closing-in-3-days reminders
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "all = post every current job (use for a test / first post), new = only newly added, closing = closing in 3 days"
+        default: all
+        type: choice
+        options: [all, new, closing]
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -16,4 +22,4 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python3 .github/scripts/jobs_telegram.py ${{ github.event_name == 'schedule' && 'closing' || 'new' }}
+        run: python3 .github/scripts/jobs_telegram.py ${{ github.event_name == 'workflow_dispatch' && inputs.mode || (github.event_name == 'schedule' && 'closing' || 'new') }}
