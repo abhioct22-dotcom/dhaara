@@ -1,0 +1,19 @@
+name: Job alerts to Telegram
+on:
+  push:
+    branches: [main]
+    paths: ["jobs/index.json"]
+  schedule:
+    - cron: "40 5 * * *"   # 11:10 am IST daily: closing-in-3-days reminders
+  workflow_dispatch:
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - name: Post alerts
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python3 .github/scripts/jobs_telegram.py ${{ github.event_name == 'schedule' && 'closing' || 'new' }}
