@@ -163,3 +163,18 @@ signup=function(){
     '</select>';
   return dhaaraBaseSignup().replace('<label class="lbl">State *',target+'<label class="lbl">State *');
 };
+
+function addExamTargetField(){
+  if(S.view!=='signup'||document.getElementById('f_exam'))return;
+  const email=document.getElementById('f_email');
+  if(!email)return;
+  const current=(S.draft&&S.draft.exam)||'AIBE';
+  const label=document.createElement('label');
+  label.className='lbl';label.textContent='Exam you are targeting *';
+  const select=document.createElement('select');
+  select.className='txt pickbtn';select.id='f_exam';select.required=true;
+  select.innerHTML=EXAMS.map(x=>'<option value="'+esc(x)+'" '+(x===current?'selected':'')+'>'+esc(x)+'</option>').join('');
+  select.onchange=()=>{S.draft=Object.assign({},S.draft||{},readForm(),{exam:select.value})};
+  email.after(label,select);
+}
+new MutationObserver(addExamTargetField).observe(document.getElementById('app'),{childList:true,subtree:true});
