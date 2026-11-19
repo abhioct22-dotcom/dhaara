@@ -149,3 +149,17 @@ function upPractice(){
   }
   return pathPage(p.year+' · '+p.title,result+navButtons+'<a href="'+source+'" target="_blank" rel="noopener" title="Open original bilingual scan">'+scan+'</a>' +scanButtons+answer+(a.finished?'':'<button class="btn gold" onclick="upFinish()">Finish and review</button>')+'<p class="disc">Answers saved on this device.</p>');
 }
+
+/* Restore Dhaara onboarding as the first screen for new students. */
+if(!profile.reg)S.view='signup';
+
+/* Keep Google sign-in and add the missing exam-target field to onboarding. */
+const dhaaraBaseSignup=signup;
+signup=function(){
+  const current=(S.draft&&S.draft.exam)||'AIBE';
+  const target='<label class="lbl">Exam you are targeting *</label>'+
+    '<select class="txt pickbtn" id="f_exam" required onchange="S.draft=Object.assign({},S.draft||{},readForm(),{exam:this.value})">'+
+    EXAMS.map(x=>'<option value="'+esc(x)+'" '+(x===current?'selected':'')+'>'+esc(x)+'</option>').join('')+
+    '</select>';
+  return dhaaraBaseSignup().replace('<label class="lbl">State *',target+'<label class="lbl">State *');
+};
