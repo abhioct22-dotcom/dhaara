@@ -1,7 +1,5 @@
 name: YouTube live sessions
 on:
-  schedule:
-    - cron: "*/15 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
