@@ -101,11 +101,16 @@ function upLibrary(){
   return pathPage('Uttar Pradesh papers',buttons+sections);
 }
 let paperAttempt, paperUser;
+const upQuestionText={};
 function upStorage(){return 'dhaara_up_'+paperUser+'_'+S.upPaper}
-function openUpPaper(id){
+async function openUpPaper(id){
   S.upPaper=id;paperUser=UID||'guest';
   paperAttempt=store.get(upStorage(),null)||{position:1,responses:{},finished:false};
   go('uppractice');
+  if(!upQuestionText[id])try{
+    const response=await fetch('judiciary/up/text/'+id+'.json',{cache:'no-cache'});
+    if(response.ok){upQuestionText[id]=(await response.json()).questions||[];render()}
+  }catch(e){}
 }
 function savePaper(){store.set(upStorage(),paperAttempt)}
 function upMove(position){
@@ -141,13 +146,15 @@ function upPractice(){
   }
   const answer=p.starts?'<div class="up-controls"><b>Q'+n+'</b>'+['A','B','C','D'].map(v=>'<button class="up-choice" aria-pressed="'+(a.responses[n]===v)+'" '+(a.finished?'disabled':'')+' onclick="upRespond(\''+v+'\');render()">'+v+'</button>').join('')+'</div>'+ (a.finished&&p.key?'<p>Provisional key for Q'+n+' · <b>'+p.key[n-1]+'</b></p>':''):'<label class="lbl">Written answer · page '+n+'<textarea class="txt" rows="8" '+(a.finished?'readonly':'')+' oninput="upRespond(this.value)">'+esc(a.responses[n]||'')+'</textarea></label>';
   const scanButtons=p.starts?'<div class="up-controls"><button '+(page<=1?'disabled':'')+' onclick="paperAttempt.scanPage='+ (page-1)+';render()">‹ Scan</button><small>Paper page '+page+' / '+p.pages+'</small><button '+(page>=p.pages?'disabled':'')+' onclick="paperAttempt.scanPage='+ (page+1)+';render()">Scan ›</button></div>':'';
-  let scan='<img class="up-scan" src="'+source+'" alt="Original bilingual paper, page '+page+'">';
-  if(p.starts && !a.scanPage){
+  const questionText=!a.scanPage&&upQuestionText[p.id]&&upQuestionText[p.id][n-1];
+  let scan=questionText?'<article class="card" style="white-space:pre-wrap;line-height:1.65"><small>Question '+n+' · Extracted from the official UPPSC paper</small><p style="margin-top:10px">'+esc(questionText)+'</p></article>':'<img class="up-scan" src="'+source+'" alt="Original bilingual paper, page '+page+'">';
+  if(p.starts && !a.scanPage&&!questionText){
     const [top,bottom,ratio]=p.bounds[n-1];
     const hindi=LANG()==='hi';
     scan='<div class="up-question" style="aspect-ratio:'+(.52*ratio/(bottom-top))+'"><img src="'+source+'" alt="Question '+n+' from the original paper" style="width:'+100/.52+'%;left:'+(hindi?-100*.48/.52:0)+'%;top:'+(-100*top/(bottom-top))+'%"></div>';
   }
-  return pathPage(p.year+' · '+p.title,result+navButtons+'<a href="'+source+'" target="_blank" rel="noopener" title="Open original bilingual scan">'+scan+'</a>' +scanButtons+answer+(a.finished?'':'<button class="btn gold" onclick="upFinish()">Finish and review</button>')+'<p class="disc">Answers saved on this device.</p>');
+  const paperView=questionText?scan+'<a class="more" href="'+source+'" target="_blank" rel="noopener">View original bilingual scan</a>':'<a href="'+source+'" target="_blank" rel="noopener" title="Open original bilingual scan">'+scan+'</a>';
+  return pathPage(p.year+' · '+p.title,result+navButtons+paperView+scanButtons+answer+(a.finished?'':'<button class="btn gold" onclick="upFinish()">Finish and review</button>')+'<p class="disc">Answers saved on this device.</p>');
 }
 
 /* Restore Dhaara onboarding as the first screen for new students. */
