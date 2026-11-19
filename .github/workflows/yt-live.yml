@@ -1,0 +1,34 @@
+name: YouTube live sessions
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: yt-live
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check the channel
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+          YT_CHANNEL_ID: ${{ vars.YT_CHANNEL_ID }}
+          YT_ONLY_TEACHERS: ${{ vars.YT_ONLY_TEACHERS }}
+        run: python .github/scripts/yt_live.py
+      - name: Publish if changed
+        run: |
+          if [ -n "$(git status --porcelain live.json)" ]; then
+            git config user.name "Dhaara"
+            git config user.email "noreply@dhaara.app"
+            git add live.json
+            git commit -m "Live sessions update"
+            git pull --rebase -q
+            git push
+          fi
